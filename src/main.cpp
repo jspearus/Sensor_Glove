@@ -6,6 +6,11 @@
 #define ADS_RESET_PIN (3)     // Pin number attached to ads reset line.
 #define ADS_INTERRUPT_PIN (4) // Pin number attached to the ads data ready line.
 
+//############################### VARIABLES ###########################################
+float mFinger = 0.0;
+int middle = 0;
+String Data_In = "";
+
 //########### FUNCTION DECLARATIONS ############
 void ads_data_callback(float *sample);
 void deadzone_filter(float *sample);
@@ -23,15 +28,19 @@ void ads_data_callback(float *sample, uint8_t sample_type)
     // Deadzone filter
     deadzone_filter(sample);
 
-    Serial.println(sample[0]);
+    //Serial.println(sample[0]);
+    mFinger = sample[0];
+    middle = (int)mFinger;
   }
 }
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(115200);  // DEBUG
+  Serial1.begin(115200); //Data Output
+  Serial1.setTimeout(100);
 
-  Serial.println("Initializing One Axis sensor");
+  Serial1.println("Initializing One Axis sensor#");
 
   ads_init_t init; // One Axis ADS initialization structure
 
@@ -62,11 +71,28 @@ void loop()
 {
 
   // New data received through the callback function ads_data_callback
-
+  // Serial.println(mFinger);
+  // delay(20);
   // Check for received hot keys on the com port
-  if (Serial.available())
+  // if (Serial.available())
+  // {
+  //   parse_com_port();
+  // }
+}
+
+void serialEvent1()
+{ //Data Request
+  while (Serial1.available())
   {
-    parse_com_port();
+
+    // Returns data
+    Data_In = Serial1.readStringUntil('#');
+    if (Data_In == "gfd")
+    {
+      Serial1.print(middle);
+      Serial1.print('#');
+      Data_In = "";
+    }
   }
 }
 

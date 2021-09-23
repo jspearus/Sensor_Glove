@@ -40,7 +40,7 @@ void setup()
   Serial1.begin(115200); //Data Output
   Serial1.setTimeout(100);
 
-  Serial1.println("Initializing One Axis sensor#");
+  Serial1.println("Initializing One Axis sensor...");
 
   ads_init_t init; // One Axis ADS initialization structure
 

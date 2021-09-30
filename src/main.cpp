@@ -12,7 +12,7 @@ const byte mode_sel = 9;
 float iFinger = 0.0;
 int Index = 0;
 String Data_In = "";
-String mode = "c";
+String mode = "s";
 
 unsigned long sysClock;
 
@@ -56,7 +56,7 @@ void setup()
   Serial2.begin(115200); //Index Finger Input
   Serial2.setTimeout(100);
 
-  Serial1.println("Initializing One Axis sensor...");
+  Serial1.println("Initializing Sensor Glove...");
 
   ads_init_t init; // One Axis ADS initialization structure
 
@@ -71,12 +71,12 @@ void setup()
 
   if (ret_val != ADS_OK)
   {
-    Serial.print("One Axis ADS initialization failed with reason: ");
+    Serial.print("Sensor Glove failed with reason: ");
     Serial.println(ret_val);
   }
   else
   {
-    Serial.println("One Axis ADS initialization succeeded...");
+    Serial.println("Sensor Glove Online...");
   }
 
   // Start reading data in interrupt mode
@@ -96,21 +96,30 @@ void loop()
     int deboucedInput = bounce.read();
     if (deboucedInput == LOW)
     {
-      if (mode == "c")
+      if (mode == "s")
       {
-        mode = "r";
+        mode = "a";
       }
-      else if (mode == "r")
+      else if (mode == "a")
       {
-        mode = "c";
+        mode = "s";
       }
+      Serial.print(mode);
+      Serial.println('#');
+    }
+  }
+  if (Index > 120 && mode == "s")
+  {
+    Serial.println("mode#");
+    while (Index > 118)
+    {
+      delay(50);
     }
   }
 }
 
 void serialEvent()
 { //Data Request
-  Serial2.print("gid#");
   while (Serial.available())
   {
     // Returns data
@@ -118,9 +127,7 @@ void serialEvent()
     if (Data_In == "gfd")
     {
       Serial.print(Index);
-      Serial.print("-");
-      Serial.print(mode);
-      Serial.print('#');
+      Serial.println('#');
       Data_In = "";
     }
   }
@@ -135,8 +142,8 @@ void serialEvent1()
     Data_In = Serial1.readStringUntil('#');
     if (Data_In == "gfd")
     {
-      Serial1.print(Index);
-      Serial1.println('#');
+      Serial.print(Index);
+      Serial.print('#');
       Data_In = "";
     }
   }

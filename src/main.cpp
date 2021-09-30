@@ -15,6 +15,8 @@ String Data_In = "";
 String mode = "s";
 
 unsigned long sysClock;
+int waitTime = 1000;
+int clicks = 0;
 
 //########### FUNCTION DECLARATIONS ############
 void mode_set();
@@ -46,7 +48,7 @@ void setup()
 {
   bounce.attach(mode_sel, INPUT_PULLUP);
   // DEBOUNCE INTERVAL IN MILLISECONDS
-  bounce.interval(5); // interval in ms
+  bounce.interval(20); // interval in ms
 
   Serial.begin(115200); // DEBUG
 
@@ -85,29 +87,46 @@ void setup()
 
 void loop()
 {
-  sysClock = millis();
+  // sysClock = millis();
+
   // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
   bounce.update();
-
-  // New data received through the callback function ads_data_callback
-
   if (bounce.changed())
   {
     int deboucedInput = bounce.read();
-    if (deboucedInput == LOW)
+    if (deboucedInput == LOW && clicks == 0)
     {
-      if (mode == "s")
-      {
-        mode = "a";
-      }
-      else if (mode == "a")
-      {
-        mode = "s";
-      }
-      Serial.print(mode);
-      Serial.println('#');
+      sysClock = millis();
+      clicks = clicks + 1;
+    }
+    else if (clicks > 0 && sysClock + waitTime > millis())
+    {
+      clicks = clicks + 1;
     }
   }
+
+  if (clicks == 6 && sysClock + waitTime < millis())
+  {
+    mode_set();
+    Serial.print("clicks = ");
+    Serial.println(clicks);
+    sysClock = 0;
+    clicks = 0;
+  }
+
+  else if (clicks > 0 && sysClock + waitTime < millis())
+  {
+    Serial.print("clicks = ");
+    Serial.println(clicks);
+    sysClock = 0;
+    clicks = 0;
+  }
+  else if (sysClock + waitTime < millis())
+  {
+    sysClock = 0;
+    clicks = 0;
+  }
+
   if (Index > 120 && mode == "s")
   {
     Serial.println("mode#");
@@ -116,6 +135,20 @@ void loop()
       delay(50);
     }
   }
+}
+
+void mode_set()
+{
+  if (mode == "s")
+  {
+    mode = "a";
+  }
+  else if (mode == "a")
+  {
+    mode = "s";
+  }
+  Serial.print(mode);
+  Serial.println('#');
 }
 
 void serialEvent()

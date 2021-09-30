@@ -15,7 +15,7 @@ String Data_In = "";
 String mode = "s";
 
 unsigned long sysClock;
-int waitTime = 1000;
+int waitTime = 1500;
 int clicks = 0;
 
 //########### FUNCTION DECLARATIONS ############
@@ -97,15 +97,15 @@ void loop()
     if (deboucedInput == LOW && clicks == 0)
     {
       sysClock = millis();
-      clicks = clicks + 1;
+      clicks = 1;
     }
-    else if (clicks > 0 && sysClock + waitTime > millis())
+    else if (deboucedInput == LOW && clicks > 0 && sysClock + waitTime > millis())
     {
-      clicks = clicks + 1;
+      clicks++;
     }
   }
 
-  if (clicks == 6 && sysClock + waitTime < millis())
+  if (clicks == 3 && sysClock + waitTime < millis())
   {
     mode_set();
     Serial.print("clicks = ");

@@ -56,7 +56,7 @@ void setup()
   Serial2.begin(115200); //Index Finger Input
   Serial2.setTimeout(100);
 
-  Serial1.println("Initializing One Axis sensor#");
+  Serial1.println("Initializing One Axis sensor...");
 
   ads_init_t init; // One Axis ADS initialization structure
 

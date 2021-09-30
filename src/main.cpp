@@ -127,12 +127,12 @@ void loop()
     clicks = 0;
   }
 
-  if (Index > 120 && mode == "s")
+  if (Index > 75 && mode == "s")
   {
     Serial.println("mode#");
-    while (Index > 118)
+    while (Index > 75)
     {
-      delay(50);
+      delay(20);
     }
   }
 }

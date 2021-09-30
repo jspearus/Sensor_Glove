@@ -1,17 +1,23 @@
 #include <Arduino.h>
 #include "ads.h"
+#include <Bounce2.h>
 
 //################# PIN DEFINITIONS ########################
 
 #define ADS_RESET_PIN (3)     // Pin number attached to ads reset line.
 #define ADS_INTERRUPT_PIN (4) // Pin number attached to the ads data ready line.
+const byte mode_sel = 9;
 
 //############################### VARIABLES ###########################################
-float mFinger = 0.0;
-int middle = 0;
+float iFinger = 0.0;
+int Index = 0;
 String Data_In = "";
+String mode = "c";
+
+unsigned long sysClock;
 
 //########### FUNCTION DECLARATIONS ############
+void mode_set();
 void ads_data_callback(float *sample);
 void deadzone_filter(float *sample);
 void signal_filter(float *sample);
@@ -29,16 +35,26 @@ void ads_data_callback(float *sample, uint8_t sample_type)
     deadzone_filter(sample);
 
     //Serial.println(sample[0]);
-    mFinger = sample[0];
-    middle = (int)mFinger;
+    iFinger = sample[0];
+    Index = (int)iFinger;
   }
 }
+// INSTANTIATE A Bounce OBJECT.
+Bounce bounce = Bounce();
 
 void setup()
 {
-  Serial.begin(115200);  // DEBUG
+  bounce.attach(mode_sel, INPUT_PULLUP);
+  // DEBOUNCE INTERVAL IN MILLISECONDS
+  bounce.interval(5); // interval in ms
+
+  Serial.begin(115200); // DEBUG
+
   Serial1.begin(115200); //Data Output
-  Serial1.setTimeout(100);
+  Serial1.setTimeout(50);
+
+  Serial2.begin(115200); //Index Finger Input
+  Serial2.setTimeout(100);
 
   Serial1.println("Initializing One Axis sensor#");
 
@@ -69,15 +85,45 @@ void setup()
 
 void loop()
 {
+  sysClock = millis();
+  // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
+  bounce.update();
 
   // New data received through the callback function ads_data_callback
-  // Serial.println(mFinger);
-  // delay(20);
-  // Check for received hot keys on the com port
-  // if (Serial.available())
-  // {
-  //   parse_com_port();
-  // }
+
+  if (bounce.changed())
+  {
+    int deboucedInput = bounce.read();
+    if (deboucedInput == LOW)
+    {
+      if (mode == "c")
+      {
+        mode = "r";
+      }
+      else if (mode == "r")
+      {
+        mode = "c";
+      }
+    }
+  }
+}
+
+void serialEvent()
+{ //Data Request
+  Serial2.print("gid#");
+  while (Serial.available())
+  {
+    // Returns data
+    Data_In = Serial.readStringUntil('#');
+    if (Data_In == "gfd")
+    {
+      Serial.print(Index);
+      Serial.print("-");
+      Serial.print(mode);
+      Serial.print('#');
+      Data_In = "";
+    }
+  }
 }
 
 void serialEvent1()
@@ -89,54 +135,18 @@ void serialEvent1()
     Data_In = Serial1.readStringUntil('#');
     if (Data_In == "gfd")
     {
-      Serial1.print(middle);
-      Serial1.print('#');
+      Serial1.print(Index);
+      Serial1.println('#');
       Data_In = "";
     }
   }
 }
-
-/* Function parses received characters from the COM port for commands */
-void parse_com_port(void)
-{
-  char key = Serial.read();
-
-  switch (key)
+void serialEvent2()
+{ //Data Request
+  while (Serial2.available())
   {
-  case '0':
-    // Take first calibration point at zero degrees
-    ads_calibrate(ADS_CALIBRATE_FIRST, 0);
-    break;
-  case '9':
-    // Take second calibration point at 180 degrees
-    ads_calibrate(ADS_CALIBRATE_SECOND, 180);
-    break;
-  case 'c':
-    // Restore factory calibration coefficients
-    ads_calibrate(ADS_CALIBRATE_CLEAR, 0);
-    break;
-  case 'r':
-    // Start sampling in interrupt mode
-    ads_run(true);
-    break;
-  case 's':
-    // Place ADS in suspend mode
-    ads_run(false);
-    break;
-  case 'f':
-    // Set ADS sample rate to 200 Hz (interrupt mode)
-    ads_set_sample_rate(ADS_200_HZ);
-    break;
-  case 'u':
-    // Set ADS sample to rate to 10 Hz (interrupt mode)
-    ads_set_sample_rate(ADS_10_HZ);
-    break;
-  case 'n':
-    // Set ADS sample rate to 100 Hz (interrupt mode)
-    ads_set_sample_rate(ADS_100_HZ);
-    break;
-  default:
-    break;
+    // Returns data
+    Index = Serial2.readStringUntil('#').toInt();
   }
 }
 

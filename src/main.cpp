@@ -15,7 +15,7 @@ String Data_In = "";
 String mode = "a";
 
 unsigned long sysClock;
-int waitTime = 1000;
+int waitTime = 750;
 int clicks = 0;
 
 //########### FUNCTION DECLARATIONS ############
@@ -85,22 +85,21 @@ void setup()
 void loop()
 {
   // Update the Bounce instance (YOU MUST DO THIS EVERY LOOP)
+
   bounce.update();
-  if (bounce.changed())
+  int deboucedInput = bounce.read();
+  if (deboucedInput == LOW && clicks == 0)
   {
-    int deboucedInput = bounce.read();
-    if (deboucedInput == LOW && clicks == 0)
-    {
-      sysClock = millis();
-      clicks = 1;
-    }
-    else if (deboucedInput == LOW && clicks > 0 && sysClock + waitTime > millis())
-    {
-      clicks++;
-    }
+    sysClock = millis();
+    clicks = 1;
+  }
+  else if (deboucedInput == LOW && clicks > 0 && sysClock + waitTime < millis())
+  {
+    clicks++;
+    sysClock = millis();
   }
 
-  if (clicks == 3 && sysClock + waitTime < millis())
+  if (clicks > 1 && clicks < 4 && mode == "a" && deboucedInput == HIGH)
   {
     mode_set();
     Serial.print("clicks = ");
@@ -108,7 +107,7 @@ void loop()
     sysClock = 0;
     clicks = 0;
   }
-  if (clicks > 0 && sysClock + 200 < millis() && mode == "s")
+  else if (clicks > 0 && sysClock + 200 < millis() && mode == "s" && deboucedInput == HIGH)
   {
     mode_set();
     Serial.print("clicks = ");
@@ -117,23 +116,19 @@ void loop()
     clicks = 0;
   }
 
-  else if (clicks > 0 && sysClock + waitTime < millis())
+  else if (clicks > 0 && sysClock + waitTime < millis() && deboucedInput == HIGH)
   {
     Serial.print("clicks = ");
     Serial.println(clicks);
     sysClock = 0;
     clicks = 0;
   }
-  else if (sysClock + waitTime < millis())
-  {
-    sysClock = 0;
-    clicks = 0;
-  }
 
-  if (Index > 75 && mode == "s")
+  if (Index > 100 && mode == "s")
   {
     Serial1.println("mode#");
-    while (Index > 75)
+    Serial.println("mode#");
+    while (Index > 100)
     {
       delay(250);
     }
@@ -152,6 +147,8 @@ void mode_set()
   }
   Serial1.print(mode);
   Serial1.print('#');
+  Serial.print(mode);
+  Serial.print('#');
 }
 
 void serialEvent()

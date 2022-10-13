@@ -36,7 +36,7 @@ void ads_data_callback(float *sample, uint8_t sample_type)
     // Deadzone filter
     deadzone_filter(sample);
 
-    //Serial.println(sample[0]);
+    // Serial.println(sample[0]);
     iFinger = sample[0];
     Index = (int)iFinger;
   }
@@ -52,7 +52,7 @@ void setup()
 
   Serial.begin(115200); // DEBUG
 
-  Serial1.begin(115200); //Data Output
+  Serial1.begin(115200); // Data Output
   Serial1.setTimeout(50);
 
   Serial.println("Initializing Sensor Glove...");
@@ -76,6 +76,7 @@ void setup()
   else
   {
     Serial.println("Sensor Glove Online...");
+    Serial1.println("sglove#");
   }
 
   // Start reading data in interrupt mode
@@ -152,7 +153,7 @@ void mode_set()
 }
 
 void serialEvent()
-{ //Data Request
+{ // Data Request
   while (Serial.available())
   {
     // Returns data
@@ -167,7 +168,7 @@ void serialEvent()
 }
 
 void serialEvent1()
-{ //Data Request
+{ // Data Request
   while (Serial1.available())
   {
     // Returns data
@@ -181,9 +182,9 @@ void serialEvent1()
   }
 }
 
-/* 
+/*
  *  Second order Infinite impulse response low pass filter. Sample freqency 100 Hz.
- *  Cutoff freqency 20 Hz. 
+ *  Cutoff freqency 20 Hz.
  */
 void signal_filter(float *sample)
 {
@@ -205,9 +206,9 @@ void signal_filter(float *sample)
   }
 }
 
-/* 
+/*
  *  If the current sample is less that 0.5 degrees different from the previous sample
- *  the function returns the previous sample. Removes jitter from the signal. 
+ *  the function returns the previous sample. Removes jitter from the signal.
  */
 void deadzone_filter(float *sample)
 {

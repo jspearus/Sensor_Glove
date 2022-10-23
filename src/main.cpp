@@ -103,24 +103,25 @@ void loop()
   if (clicks > 1 && clicks < 4 && mode == "a" && deboucedInput == HIGH)
   {
     mode_set();
-    // Serial.print("clicks = ");
-    // Serial.println(clicks);
+    Serial.print("Aclicks = ");
+    Serial.println(clicks);
     sysClock = 0;
     clicks = 0;
   }
   else if (clicks > 0 && sysClock + 200 < millis() && mode == "s" && deboucedInput == HIGH)
   {
     mode_set();
-    // Serial.print("clicks = ");
-    // Serial.println(clicks);
+    Serial.print("Sclicks = ");
+    Serial.println(clicks);
     sysClock = 0;
     clicks = 0;
   }
 
   else if (clicks > 0 && sysClock + waitTime < millis() && deboucedInput == HIGH)
   {
-    // Serial.print("clicks = ");
-    // Serial.println(clicks);
+    Serial.print("clicks = ");
+    Serial.println(clicks);
+    Serial.println("c#");
     sysClock = 0;
     clicks = 0;
   }
@@ -128,7 +129,7 @@ void loop()
   if (Index > 100 && mode == "s")
   {
     Serial1.println("mode#");
-    // Serial.println("mode#");
+    Serial.println("mode#");
     while (Index > 100)
     {
       delay(250);
@@ -148,8 +149,8 @@ void mode_set()
   }
   Serial1.print(mode);
   Serial1.print('#');
-  // Serial.print(mode);
-  // Serial.print('#');
+  Serial.print(mode);
+  Serial.print('#');
 }
 
 void serialEvent()

@@ -129,7 +129,7 @@ void loop()
   if (Index > 100 && mode == "s")
   {
     Serial1.println("mode#");
-    // Serial.println("mode#");
+    Serial.println("mode#");
     while (Index > 100)
     {
       delay(250);
@@ -165,6 +165,11 @@ void serialEvent()
       Serial.println('#');
       Data_In = "";
     }
+    else if (Data_In == "qcm") // quick click mode
+    {
+      mode = "s";
+      Serial.println("qcm mode");
+    }
   }
 }
 
@@ -179,6 +184,11 @@ void serialEvent1()
       Serial1.print(Index);
       Serial1.print('#');
       Data_In = "";
+    }
+    else if (Data_In == "qcm") // quick click mode
+    {
+      mode = "s";
+      Serial.println("qcm mode");
     }
   }
 }

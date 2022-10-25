@@ -13,6 +13,7 @@ float iFinger = 0.0;
 int Index = 0;
 String Data_In = "";
 String mode = "a";
+bool qMode = false;
 
 unsigned long sysClock;
 int waitTime = 750;
@@ -121,7 +122,10 @@ void loop()
   {
     // Serial.print("clicks = ");
     // Serial.println(clicks);
-    Serial1.println("c#");
+    if (qMode == true)
+    {
+      mode_set();
+    }
     sysClock = 0;
     clicks = 0;
   }
@@ -167,8 +171,13 @@ void serialEvent()
     }
     else if (Data_In == "qcm") // quick click mode
     {
-      mode = "s";
+      qMode = true;
       Serial.println("qcm mode");
+    }
+    else if (Data_In == "qcmd") // quick click mode
+    {
+      qMode = false;
+      Serial.println("qcm mode dis");
     }
   }
 }
@@ -187,8 +196,13 @@ void serialEvent1()
     }
     else if (Data_In == "qcm") // quick click mode
     {
-      mode = "s";
+      qMode = true;
       Serial.println("qcm mode");
+    }
+    else if (Data_In == "qcmd") // quick click mode
+    {
+      qMode = false;
+      Serial.println("qcm mode dis");
     }
   }
 }

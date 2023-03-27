@@ -2,13 +2,13 @@
 #include "ads.h"
 #include <Bounce2.h>
 
-//################# PIN DEFINITIONS ########################
+// ################# PIN DEFINITIONS ########################
 
 #define ADS_RESET_PIN (3)     // Pin number attached to ads reset line.
 #define ADS_INTERRUPT_PIN (4) // Pin number attached to the ads data ready line.
 const byte mode_sel = 9;
 
-//############################### VARIABLES ###########################################
+// ############################### VARIABLES ###########################################
 float iFinger = 0.0;
 int Index = 0;
 String Data_In = "";
@@ -19,7 +19,7 @@ unsigned long sysClock;
 int waitTime = 750;
 int clicks = 0;
 
-//########### FUNCTION DECLARATIONS ############
+// ########### FUNCTION DECLARATIONS ############
 void mode_set();
 void ads_data_callback(float *sample);
 void deadzone_filter(float *sample);
@@ -140,6 +140,7 @@ void loop()
     }
   }
 }
+// #####################################3 END OF MAIN LOOP #####################################
 
 void mode_set()
 {
